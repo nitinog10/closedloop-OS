@@ -1,0 +1,10 @@
+{
+  "host": { "id": "zoom-host-1" },
+  "recording": {
+    "id": "zoom-meeting-7788",
+    "uuid": "zoom-uuid-7788",
+    "topic": "Auth architecture review",
+    "share_url": "https://zoom.us/rec/share/demo",
+    "transcript": "Decision: align authentication rollout with AUTH-142 and centralize token validation before deprecating legacy providers."
+  }
+}

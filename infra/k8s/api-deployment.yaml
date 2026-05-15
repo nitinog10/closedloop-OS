@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: closedloop-api
+  namespace: closedloop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: closedloop-api
+  template:
+    metadata:
+      labels:
+        app: closedloop-api
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/your-org/closedloop-api:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: closedloop-config
+            - secretRef:
+                name: closedloop-secrets
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: closedloop-api
+  namespace: closedloop
+spec:
+  selector:
+    app: closedloop-api
+  ports:
+    - port: 80
+      targetPort: 8000

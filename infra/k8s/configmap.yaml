@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: closedloop-config
+  namespace: closedloop
+data:
+  APP_NAME: ClosedLoop OS
+  APP_URL: https://closedloop.example.com
+  API_URL: https://api.closedloop.example.com
+  REDIS_URL: redis://closedloop-redis:6379/0
+  KAFKA_BOOTSTRAP_SERVERS: redpanda:9092

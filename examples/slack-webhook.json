@@ -1,0 +1,11 @@
+{
+  "event_id": "EvDemo123",
+  "source_url": "https://company.slack.com/archives/C123/p172000000",
+  "event": {
+    "type": "message",
+    "user": "U123",
+    "channel": "platform-architecture",
+    "text": "Decision: centralize token validation in shared middleware and keep authorization policy checks service-local.",
+    "ts": "1720000000.000200"
+  }
+}

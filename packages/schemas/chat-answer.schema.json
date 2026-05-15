@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://closedloop.dev/schemas/chat-answer.schema.json",
+  "title": "ChatAnswer",
+  "type": "object",
+  "required": ["answer", "citations", "trace"],
+  "properties": {
+    "answer": { "type": "string" },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["event_id", "source_type", "source_title", "quote", "relevance_score"],
+        "properties": {
+          "event_id": { "type": "string" },
+          "source_type": { "type": "string" },
+          "source_title": { "type": "string" },
+          "source_url": { "type": ["string", "null"] },
+          "quote": { "type": "string" },
+          "relevance_score": { "type": "number" }
+        }
+      }
+    },
+    "trace": { "type": "object" }
+  }
+}

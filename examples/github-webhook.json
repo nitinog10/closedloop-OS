@@ -1,0 +1,15 @@
+{
+  "action": "opened",
+  "repository": {
+    "full_name": "closedloop/core"
+  },
+  "pull_request": {
+    "id": 418,
+    "title": "Refactor auth middleware",
+    "body": "Implements centralized token validation with provider abstraction and cache-aware JWKS lookup.",
+    "html_url": "https://github.com/closedloop/core/pull/418"
+  },
+  "sender": {
+    "login": "arch-lead"
+  }
+}

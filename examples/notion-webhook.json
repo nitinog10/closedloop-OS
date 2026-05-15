@@ -1,0 +1,11 @@
+{
+  "type": "document",
+  "actor": { "id": "notion-editor-1" },
+  "page": {
+    "id": "page-auth-001",
+    "title": "Authentication Architecture Decision Record",
+    "content": "Decision: use centralized token validation middleware and service-scoped policy evaluation.",
+    "url": "https://notion.so/acme/auth-architecture",
+    "space_id": "engineering"
+  }
+}

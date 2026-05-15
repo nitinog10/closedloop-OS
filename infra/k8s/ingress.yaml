@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: closedloop-ingress
+  namespace: closedloop
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: closedloop.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: closedloop-web
+                port:
+                  number: 80
+    - host: api.closedloop.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: closedloop-api
+                port:
+                  number: 80

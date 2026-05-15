@@ -1,0 +1,94 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: closedloop
+      POSTGRES_USER: closedloop
+      POSTGRES_PASSWORD: closedloop
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../apps/api/app/db/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.2.11
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp=1
+      - --memory=1G
+      - --reserve-memory=0M
+      - --node-id=0
+      - --check=false
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
+    ports:
+      - '9092:9092'
+
+  neo4j:
+    image: neo4j:5.25
+    environment:
+      NEO4J_AUTH: neo4j/closedloop123
+    ports:
+      - '7474:7474'
+      - '7687:7687'
+
+  api:
+    build:
+      context: ../apps/api
+    env_file:
+      - ../.env.example
+    environment:
+      DATABASE_URL: postgresql+asyncpg://closedloop:closedloop@postgres:5432/closedloop
+      REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      API_URL: http://localhost:8000
+      APP_URL: http://localhost:3000
+    depends_on:
+      - postgres
+      - redis
+      - redpanda
+    ports:
+      - '8000:8000'
+
+  worker-pipeline:
+    build:
+      context: ../apps/api
+    command: python -m app.workers.pipeline_worker
+    env_file:
+      - ../.env.example
+    environment:
+      DATABASE_URL: postgresql+asyncpg://closedloop:closedloop@postgres:5432/closedloop
+      REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+    depends_on:
+      - postgres
+      - redis
+      - redpanda
+
+  web:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --hostname 0.0.0.0"
+    env_file:
+      - ../.env.example
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    volumes:
+      - ../apps/web:/app
+    depends_on:
+      - api
+    ports:
+      - '3000:3000'
+
+volumes:
+  postgres_data:

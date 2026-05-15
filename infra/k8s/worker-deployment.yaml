@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: closedloop-worker-pipeline
+  namespace: closedloop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: closedloop-worker-pipeline
+  template:
+    metadata:
+      labels:
+        app: closedloop-worker-pipeline
+    spec:
+      containers:
+        - name: worker-pipeline
+          image: ghcr.io/your-org/closedloop-api:latest
+          command: ["python", "-m", "app.workers.pipeline_worker"]
+          envFrom:
+            - configMapRef:
+                name: closedloop-config
+            - secretRef:
+                name: closedloop-secrets

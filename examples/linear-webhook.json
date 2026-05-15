@@ -1,0 +1,13 @@
+{
+  "type": "Issue",
+  "action": "create",
+  "actor": { "id": "linear-user-1" },
+  "data": {
+    "id": "auth-142-id",
+    "identifier": "AUTH-142",
+    "title": "Unify authentication middleware",
+    "description": "Goal: complete identity unification before Q4. References AUTH-142 and rollout sequencing.",
+    "url": "https://linear.app/acme/issue/AUTH-142",
+    "team": { "key": "PLAT" }
+  }
+}

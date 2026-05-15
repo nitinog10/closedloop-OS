@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://closedloop.dev/schemas/canonical-event.schema.json",
+  "title": "CanonicalEvent",
+  "type": "object",
+  "required": [
+    "organization_id",
+    "source",
+    "source_event_id",
+    "event_type",
+    "content",
+    "dedupe_key"
+  ],
+  "properties": {
+    "organization_id": { "type": "string", "format": "uuid" },
+    "source": { "type": "string", "enum": ["slack", "github", "linear", "notion", "zoom", "crm"] },
+    "source_event_id": { "type": "string" },
+    "source_url": { "type": ["string", "null"], "format": "uri" },
+    "event_type": { "type": "string" },
+    "actor_external_id": { "type": ["string", "null"] },
+    "channel_external_id": { "type": ["string", "null"] },
+    "title": { "type": ["string", "null"] },
+    "content": { "type": "string" },
+    "metadata": { "type": "object" },
+    "importance_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "dedupe_key": { "type": "string" }
+  }
+}
