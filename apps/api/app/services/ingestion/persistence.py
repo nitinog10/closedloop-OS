@@ -7,8 +7,8 @@ from app.models.canonical_event import CanonicalEvent
 from app.schemas.event import CanonicalEventCreate
 
 
-async def persist_canonical_events(db: AsyncSession, events: list[CanonicalEventCreate]) -> list[CanonicalEvent]:
-    persisted: list[CanonicalEvent] = []
+async def persist_canonical_events(db: AsyncSession, events: list[CanonicalEventCreate]) -> list[tuple[CanonicalEvent, bool]]:
+    persisted: list[tuple[CanonicalEvent, bool]] = []
 
     for event in events:
         existing_stmt = select(CanonicalEvent).where(
@@ -17,7 +17,7 @@ async def persist_canonical_events(db: AsyncSession, events: list[CanonicalEvent
         )
         existing = (await db.execute(existing_stmt)).scalar_one_or_none()
         if existing:
-            persisted.append(existing)
+            persisted.append((existing, False))
             continue
 
         record = CanonicalEvent(
@@ -35,9 +35,9 @@ async def persist_canonical_events(db: AsyncSession, events: list[CanonicalEvent
             dedupe_key=event.dedupe_key,
         )
         db.add(record)
-        persisted.append(record)
+        persisted.append((record, True))
 
     await db.commit()
-    for item in persisted:
+    for item, _ in persisted:
         await db.refresh(item)
     return persisted

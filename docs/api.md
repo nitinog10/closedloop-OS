@@ -23,6 +23,7 @@
 
 ## Graph
 - `GET /api/v1/graph/neighborhood/{entity_id}`
+- `GET /api/v1/graph/unlinked-work`
 
 ## Pipeline Operations
 - `POST /api/v1/pipeline/reindex`

@@ -12,3 +12,4 @@ class ConnectorUpsertRequest(BaseModel):
     type: str
     config: dict = {}
     secret: str | None = None
+    status: str = "connected"

@@ -15,5 +15,7 @@ ADAPTERS = {
 
 
 async def normalize_event(source: str, payload: dict, organization_id: str) -> list[CanonicalEventCreate]:
-    adapter = ADAPTERS[source]
+    adapter = ADAPTERS.get(source.strip().lower())
+    if adapter is None:
+        raise ValueError(f"Unsupported source '{source}'")
     return await adapter.normalize(payload=payload, organization_id=organization_id)

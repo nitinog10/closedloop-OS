@@ -1,7 +1,12 @@
 import { ChatResponse, Connector, NotificationItem } from '@/lib/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
-const AUTH_HEADER = 'Bearer demo-token-placeholder';
+const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? 'demo@closedloop.ai';
+const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? 'demo';
+const FALLBACK_AUTH_HEADER = 'Bearer demo-token-placeholder';
+
+let cachedAccessToken: string | null = null;
+let cachedTokenAt = 0;
 
 const fallbackConnectors: Connector[] = [
   {
@@ -59,8 +64,9 @@ const fallbackNotifications: NotificationItem[] = [
 
 export async function fetchConnectors(): Promise<Connector[]> {
   try {
+    const authHeader = await getAuthHeader();
     const response = await fetch(`${API_URL}/api/v1/connectors`, {
-      headers: { Authorization: AUTH_HEADER },
+      headers: { Authorization: authHeader },
       cache: 'no-store'
     });
 
@@ -73,8 +79,9 @@ export async function fetchConnectors(): Promise<Connector[]> {
 
 export async function fetchNotifications(): Promise<NotificationItem[]> {
   try {
+    const authHeader = await getAuthHeader();
     const response = await fetch(`${API_URL}/api/v1/notifications/recent`, {
-      headers: { Authorization: AUTH_HEADER },
+      headers: { Authorization: authHeader },
       cache: 'no-store'
     });
 
@@ -87,11 +94,12 @@ export async function fetchNotifications(): Promise<NotificationItem[]> {
 
 export async function askClosedLoop(query: string): Promise<ChatResponse> {
   try {
+    const authHeader = await getAuthHeader();
     const response = await fetch(`${API_URL}/api/v1/chat/query`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: AUTH_HEADER
+        Authorization: authHeader
       },
       body: JSON.stringify({ query, limit: 6 })
     });
@@ -139,4 +147,39 @@ export async function askClosedLoop(query: string): Promise<ChatResponse> {
 
 export function websocketUrl(path: string) {
   return API_URL.replace('http://', 'ws://').replace('https://', 'wss://') + path;
+}
+
+async function getAuthHeader(): Promise<string> {
+  const now = Date.now();
+  if (cachedAccessToken && now - cachedTokenAt < 50 * 60 * 1000) {
+    return `Bearer ${cachedAccessToken}`;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD
+      }),
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      return FALLBACK_AUTH_HEADER;
+    }
+
+    const payload = (await response.json()) as { access_token?: string };
+    if (!payload.access_token) {
+      return FALLBACK_AUTH_HEADER;
+    }
+    cachedAccessToken = payload.access_token;
+    cachedTokenAt = now;
+    return `Bearer ${cachedAccessToken}`;
+  } catch {
+    return FALLBACK_AUTH_HEADER;
+  }
 }

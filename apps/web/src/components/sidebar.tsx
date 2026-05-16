@@ -1,12 +1,13 @@
 'use client';
 
+import type { Route } from 'next';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BrainCircuit, Cable, ChartColumnBig, GitBranch, LayoutDashboard, MemoryStick, Rocket } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
-const items = [
+const items: Array<{ href: Route; label: string; icon: typeof BrainCircuit }> = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/chat', label: 'AI Chat', icon: BrainCircuit },
   { href: '/graph', label: 'Graph Explorer', icon: GitBranch },
